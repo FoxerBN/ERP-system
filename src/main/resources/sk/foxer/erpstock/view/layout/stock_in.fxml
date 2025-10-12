@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane fx:controller="sk.foxer.erpstock.controller.stockin.StockInController"
+            xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <TableView fx:id="stockInTable" layoutX="10" layoutY="10" AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.bottomAnchor="0">
+            <columns>
+                <TableColumn fx:id="colId" text="ID" />
+                <TableColumn fx:id="colDate" text="Date" />
+                <TableColumn fx:id="colSupplier" text="Supplier" />
+                <TableColumn fx:id="colProduct" text="Product" />
+                <TableColumn fx:id="colQuantity" text="Quantity" />
+                <TableColumn fx:id="colUnitPrice" text="Unit Price" />
+                <TableColumn fx:id="colTotal" text="Total" />
+            </columns>
+        </TableView>
+    </children>
+</AnchorPane>

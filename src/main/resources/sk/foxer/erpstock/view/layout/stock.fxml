@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefWidth="728.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sk.foxer.erpstock.controller.stock.StockController">
+
+    <children>
+        <TableView fx:id="tableProducts" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <columns>
+                <TableColumn fx:id="colId" prefWidth="60.0" text="ID" />
+                <TableColumn fx:id="colCode" prefWidth="95.0" text="Code" />
+                <TableColumn fx:id="colName" prefWidth="150.0" text="Name" />
+                <TableColumn fx:id="colUnit" prefWidth="70.0" text="Unit" />
+                <TableColumn fx:id="colPurchase" prefWidth="120.0" text="Purchase Price" />
+                <TableColumn fx:id="colSale" prefWidth="120.0" text="Sale Price" />
+                <TableColumn fx:id="colStock" prefWidth="120.0" text="Current Stock" />
+            </columns>
+         <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+         </columnResizePolicy>
+        </TableView>
+    </children>
+</AnchorPane>

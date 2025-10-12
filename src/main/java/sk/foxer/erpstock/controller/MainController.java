@@ -1,0 +1,112 @@
+package sk.foxer.erpstock.controller;
+
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import sk.foxer.erpstock.controller.stockin.StockInController;
+import sk.foxer.erpstock.controller.stockin.SupplierDetailController;
+import sk.foxer.erpstock.model.stockin.Supplier;
+import sk.foxer.erpstock.util.UIHelper;
+
+import java.io.IOException;
+
+public class MainController {
+
+    @FXML
+    private AnchorPane masterPane;
+    @FXML
+    private AnchorPane centerPane;
+    @FXML
+    private AnchorPane detailPane;
+    @FXML
+    private ToolbarController toolbarController;
+
+
+    @FXML
+    public void initialize() {
+        if (toolbarController != null) {
+            toolbarController.setMainController(this);
+        } else {
+            System.out.println("⚠️ ToolbarController je null!");
+        }
+        masterPane.getProperties().put("mainController", this);
+
+        showStockView();
+    }
+
+
+
+
+    // ====== VIEW PREPINANIE ======
+    public void showStockView() {
+        closeDetail(); // zavri detail, ak je zobrazený
+        loadCenter("/sk/foxer/erpstock/view/layout/stock.fxml");
+    }
+
+    public void showStockInView() {
+        closeDetail();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(
+                    "/sk/foxer/erpstock/view/layout/stock_in.fxml"
+            ));
+            AnchorPane view = loader.load();
+
+            StockInController controller = loader.getController();
+            controller.setMainController(this);
+
+            centerPane.getChildren().setAll(view);
+            AnchorPane.setTopAnchor(view, 0.0);
+            AnchorPane.setBottomAnchor(view, 0.0);
+            AnchorPane.setLeftAnchor(view, 0.0);
+            AnchorPane.setRightAnchor(view, 0.0);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
+    private void loadCenter(String fxmlPath) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            AnchorPane view = loader.load();
+            centerPane.getChildren().setAll(view);
+            AnchorPane.setTopAnchor(view, 0.0);
+            AnchorPane.setBottomAnchor(view, 0.0);
+            AnchorPane.setLeftAnchor(view, 0.0);
+            AnchorPane.setRightAnchor(view, 0.0);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void showSupplierDetail(Supplier supplier) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(
+                    "/sk/foxer/erpstock/view/layout/supplier_detail.fxml"
+            ));
+            AnchorPane detailView = loader.load();
+
+            SupplierDetailController controller = loader.getController();
+            controller.setSupplier(supplier);
+
+
+            detailPane.getChildren().setAll(detailView);
+            AnchorPane.setTopAnchor(detailView, 0.0);
+            AnchorPane.setBottomAnchor(detailView, 0.0);
+            AnchorPane.setLeftAnchor(detailView, 0.0);
+            AnchorPane.setRightAnchor(detailView, 0.0);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //----- helper -----//
+    private void closeDetail() {
+        UIHelper.clearDetailPane(detailPane);
+    }
+
+}
