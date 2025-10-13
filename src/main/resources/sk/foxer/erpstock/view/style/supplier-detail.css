@@ -1,0 +1,44 @@
+.anchor-pane {
+    -fx-background-color: #eaf3ff; /* bledomodré pozadie */
+}
+
+/* Karta */
+.inner-box {
+    -fx-background-color: white;
+    -fx-padding: 15 20 15 20;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0, 0, 3);
+    -fx-alignment: TOP_RIGHT;
+}
+
+/* Jemne sivý text */
+.label-grey {
+    -fx-text-fill: #555;
+}
+
+/* Tlačidlo Kopírovať */
+.copy-button {
+    -fx-background-color: #cfe2ff;
+    -fx-text-fill: #0d47a1;
+    -fx-font-size: 12px;
+    -fx-padding: 5 12;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+    -fx-border-color: #a3c2ff;
+    -fx-border-radius: 4;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 2, 0, 0, 1);
+}
+
+.copy-button:hover {
+    -fx-background-color: #82b1ff;
+    -fx-text-fill: white;
+    -fx-scale-y: 1.03;
+    -fx-scale-x: 1.03;
+}
+
+.copy-button:pressed {
+    -fx-background-color: #5c8dfc;
+    -fx-text-fill: white;
+    -fx-scale-y: 0.98;
+    -fx-scale-x: 0.98;
+}

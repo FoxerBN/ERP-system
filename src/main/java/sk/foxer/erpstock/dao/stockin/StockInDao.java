@@ -35,4 +35,38 @@ public class StockInDao {
         }
         return list;
     }
+
+
+    public static List<StockIn> getBySupplierId(int supplierId) {
+        List<StockIn> list = new ArrayList<>();
+        String sql = """
+        SELECT si.id,
+               si.date,
+               s.name AS supplier_name,
+               p.name AS product_name,
+               si.quantity,
+               si.unit_price,
+               (si.quantity * si.unit_price) AS total
+        FROM stock_in si
+        JOIN suppliers s ON si.supplier_id = s.id
+        JOIN products p ON si.product_id = p.id
+        WHERE si.supplier_id = ?
+        ORDER BY si.date DESC, si.id DESC
+    """;
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, supplierId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    list.add(StockInMapper.map(rs));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
 }

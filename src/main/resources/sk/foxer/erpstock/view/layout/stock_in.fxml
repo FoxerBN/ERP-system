@@ -6,16 +6,19 @@
 <AnchorPane fx:controller="sk.foxer.erpstock.controller.stockin.StockInController"
             xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
     <children>
-        <TableView fx:id="stockInTable" layoutX="10" layoutY="10" AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.bottomAnchor="0">
+        <TableView fx:id="stockInTable" AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.bottomAnchor="0">
             <columns>
                 <TableColumn fx:id="colId" text="ID" />
-                <TableColumn fx:id="colDate" text="Date" />
-                <TableColumn fx:id="colSupplier" text="Supplier" />
-                <TableColumn fx:id="colProduct" text="Product" />
-                <TableColumn fx:id="colQuantity" text="Quantity" />
-                <TableColumn fx:id="colUnitPrice" text="Unit Price" />
-                <TableColumn fx:id="colTotal" text="Total" />
+                <TableColumn fx:id="colDate" text="Dátum" />
+                <TableColumn fx:id="colSupplier" text="Dodávateľ" />
+                <TableColumn fx:id="colProduct" text="Produkt" />
+                <TableColumn fx:id="colQuantity" text="Množstvo" />
+                <TableColumn fx:id="colUnitPrice" text="Cena za kus" />
+                <TableColumn fx:id="colTotal" text="Celková suma" />
             </columns>
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+            </columnResizePolicy>
         </TableView>
     </children>
 </AnchorPane>

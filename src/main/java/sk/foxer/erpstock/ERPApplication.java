@@ -17,7 +17,7 @@ public class ERPApplication extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(
                 getClass().getResource("/sk/foxer/erpstock/view/main.fxml")
         );
-        Scene scene = new Scene(fxmlLoader.load(), 1000, 600);
+        Scene scene = new Scene(fxmlLoader.load(), 1900, 800);
         stage.setTitle("ERP-Foxer");
         stage.setScene(scene);
         stage.show();

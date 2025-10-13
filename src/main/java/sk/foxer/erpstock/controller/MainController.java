@@ -3,7 +3,6 @@ package sk.foxer.erpstock.controller;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
 import sk.foxer.erpstock.controller.stockin.StockInController;
 import sk.foxer.erpstock.controller.stockin.SupplierDetailController;
 import sk.foxer.erpstock.model.stockin.Supplier;
@@ -86,9 +85,14 @@ public class MainController {
     public void showSupplierDetail(Supplier supplier) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(
-                    "/sk/foxer/erpstock/view/layout/supplier_detail.fxml"
+                    "/sk/foxer/erpstock/view/layout/detail/supplier_detail.fxml"
             ));
             AnchorPane detailView = loader.load();
+
+            String css = getClass().getResource("/sk/foxer/erpstock/view/style/supplier-detail.css").toExternalForm();
+            if (css != null) {
+                detailView.getStylesheets().add(css);
+            }
 
             SupplierDetailController controller = loader.getController();
             controller.setSupplier(supplier);
