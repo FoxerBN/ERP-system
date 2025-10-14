@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/23.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="sk.foxer.erpstock.controller.stock.ProductEditController">
+    <children>
+        <VBox spacing="12"
+              AnchorPane.topAnchor="20"
+              AnchorPane.leftAnchor="20"
+              AnchorPane.rightAnchor="20">
+            <Label fx:id="lblTitle"
+                   text="Úprava produktu"
+                   style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+            <GridPane hgap="10" vgap="10">
+                <padding>
+                    <Insets top="10" right="0" bottom="10" left="0"/>
+                </padding>
+                <children>
+                    <Label text="Kód:"/>
+                    <TextField fx:id="txtCode" GridPane.columnIndex="1"/>
+
+                    <Label text="Názov:" GridPane.rowIndex="1"/>
+                    <TextField fx:id="txtName" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                    <Label text="Jednotka:" GridPane.rowIndex="2"/>
+                    <TextField fx:id="txtUnit" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+                    <Label text="Nákupná cena:" GridPane.rowIndex="3"/>
+                    <TextField fx:id="txtPurchasePrice" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
+                    <Label text="Predajná cena:" GridPane.rowIndex="4"/>
+                    <TextField fx:id="txtSalePrice" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+
+                    <Label text="Aktuálny stav:" GridPane.rowIndex="5"/>
+                    <TextField fx:id="txtCurrentStock" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+                </children>
+            </GridPane>
+            <Button text="Uložiť" onAction="#handleSave" prefWidth="120"/>
+        </VBox>
+    </children>
+</AnchorPane>

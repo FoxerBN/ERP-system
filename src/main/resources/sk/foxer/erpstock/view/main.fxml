@@ -52,13 +52,13 @@
     <fx:include fx:id="toolbar" source="layout/toolbar.fxml" />
 
 
-    <SplitPane dividerPositions="0.2505567928730512, 0.7505567928730512"
+    <SplitPane dividerPositions="0.22, 0.75"
                focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
       <items>
         <!-- ľavý panel -->
-        <AnchorPane fx:id="masterPane">
+        <AnchorPane fx:id="masterPane" minWidth="220.0" prefWidth="240.0" maxWidth="240.0">
           <children>
-            <Label alignment="CENTER" layoutX="14.0" layoutY="14.0" minWidth="60.0" text="Master" textAlignment="CENTER">
+            <Label alignment="CENTER" layoutX="14.0" layoutY="14.0" text="Master" textAlignment="CENTER">
               <font>
                 <Font size="18.0" fx:id="x1" />
               </font>

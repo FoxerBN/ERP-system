@@ -1,0 +1,31 @@
+.master-pane {
+    -fx-background-color: linear-gradient(to bottom, #e6f0ff, #cfe0ff);
+    -fx-border-color: #aac6ff;
+    -fx-border-width: 0 1 0 0;
+}
+
+.master-content {
+    -fx-alignment: TOP_LEFT;
+}
+
+.master-title {
+    -fx-text-fill: #0d47a1;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.master-button {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #0d47a1;
+    -fx-padding: 10 14;
+    -fx-border-color: transparent;
+    -fx-background-radius: 6;
+}
+
+.master-button:hover {
+    -fx-background-color: #d8e6ff;
+}
+
+.master-button:pressed {
+    -fx-background-color: #bcd4ff;
+}

@@ -3,8 +3,12 @@ package sk.foxer.erpstock.controller;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.AnchorPane;
+import sk.foxer.erpstock.controller.stock.ProductEditController;
+import sk.foxer.erpstock.controller.stock.StockController;
+import sk.foxer.erpstock.controller.stock.StockMasterController;
 import sk.foxer.erpstock.controller.stockin.StockInController;
 import sk.foxer.erpstock.controller.stockin.SupplierDetailController;
+import sk.foxer.erpstock.model.stock.Product;
 import sk.foxer.erpstock.model.stockin.Supplier;
 import sk.foxer.erpstock.util.UIHelper;
 
@@ -35,16 +39,48 @@ public class MainController {
     }
 
 
-
-
     // ====== VIEW PREPINANIE ======
     public void showStockView() {
         closeDetail(); // zavri detail, ak je zobrazený
-        loadCenter("/sk/foxer/erpstock/view/layout/stock.fxml");
+        try {
+            FXMLLoader centerLoader = new FXMLLoader(getClass().getResource(
+                    "/sk/foxer/erpstock/view/layout/stock.fxml"
+            ));
+            AnchorPane centerView = centerLoader.load();
+            StockController stockController = centerLoader.getController();
+            stockController.setMainController(this);
+
+            centerPane.getChildren().setAll(centerView);
+            AnchorPane.setTopAnchor(centerView, 0.0);
+            AnchorPane.setBottomAnchor(centerView, 0.0);
+            AnchorPane.setLeftAnchor(centerView, 0.0);
+            AnchorPane.setRightAnchor(centerView, 0.0);
+
+            FXMLLoader masterLoader = new FXMLLoader(getClass().getResource(
+                    "/sk/foxer/erpstock/view/layout/master/stock.fxml"
+            ));
+            AnchorPane masterView = masterLoader.load();
+            StockMasterController masterController = masterLoader.getController();
+            masterController.setControllers(this, stockController);
+
+            var masterCssUrl = getClass().getResource("/sk/foxer/erpstock/view/style/master-pane.css");
+            if (masterCssUrl != null) {
+                masterView.getStylesheets().add(masterCssUrl.toExternalForm());
+            }
+
+            masterPane.getChildren().setAll(masterView);
+            AnchorPane.setTopAnchor(masterView, 0.0);
+            AnchorPane.setBottomAnchor(masterView, 0.0);
+            AnchorPane.setLeftAnchor(masterView, 0.0);
+            AnchorPane.setRightAnchor(masterView, 0.0);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void showStockInView() {
         closeDetail();
+        masterPane.getChildren().clear();
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(
                     "/sk/foxer/erpstock/view/layout/stock_in.fxml"
@@ -64,8 +100,6 @@ public class MainController {
             e.printStackTrace();
         }
     }
-
-
 
 
     private void loadCenter(String fxmlPath) {
@@ -106,6 +140,30 @@ public class MainController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void showProductEdit(Product product, boolean isNew, StockController stockController) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(
+                    "/sk/foxer/erpstock/view/layout/detail/product_edit.fxml"
+            ));
+            AnchorPane detailView = loader.load();
+
+            ProductEditController controller = loader.getController();
+            controller.setContext(stockController, product, isNew);
+
+            detailPane.getChildren().setAll(detailView);
+            AnchorPane.setTopAnchor(detailView, 0.0);
+            AnchorPane.setBottomAnchor(detailView, 0.0);
+            AnchorPane.setLeftAnchor(detailView, 0.0);
+            AnchorPane.setRightAnchor(detailView, 0.0);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void closeDetailPane() {
+        closeDetail();
     }
 
     //----- helper -----//
