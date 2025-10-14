@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="sk.foxer.erpstock.controller.stockout.CustomerOutcomesController"
+      spacing="10">
+
+    <HBox alignment="CENTER_RIGHT" spacing="8">
+        <Button text="Exportovať PDF"
+                onAction="#handleExportPdf"
+                contentDisplay="LEFT"
+                graphicTextGap="8">
+            <graphic>
+                <FontIcon iconLiteral="fas-file-pdf" iconSize="16"/>
+            </graphic>
+        </Button>
+    </HBox>
+
+    <TableView fx:id="table" prefHeight="260" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colId" text="ID" prefWidth="60"/>
+            <TableColumn fx:id="colDate" text="Dátum" prefWidth="110"/>
+            <TableColumn fx:id="colProduct" text="Produkt" prefWidth="160"/>
+            <TableColumn fx:id="colQty" text="Množstvo" prefWidth="90"/>
+            <TableColumn fx:id="colUnitPrice" text="Jedn. cena" prefWidth="100"/>
+            <TableColumn fx:id="colTotal" text="Celkom" prefWidth="100"/>
+        </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+        </columnResizePolicy>
+    </TableView>
+</VBox>

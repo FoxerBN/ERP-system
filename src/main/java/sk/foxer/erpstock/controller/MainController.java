@@ -8,8 +8,11 @@ import sk.foxer.erpstock.controller.stock.StockController;
 import sk.foxer.erpstock.controller.stock.StockMasterController;
 import sk.foxer.erpstock.controller.stockin.StockInController;
 import sk.foxer.erpstock.controller.stockin.SupplierDetailController;
+import sk.foxer.erpstock.controller.stockout.CustomerDetailController;
+import sk.foxer.erpstock.controller.stockout.StockOutController;
 import sk.foxer.erpstock.model.stock.Product;
 import sk.foxer.erpstock.model.stockin.Supplier;
+import sk.foxer.erpstock.model.stockout.Customer;
 import sk.foxer.erpstock.util.UIHelper;
 
 import java.io.IOException;
@@ -141,6 +144,57 @@ public class MainController {
             e.printStackTrace();
         }
     }
+
+    public void showStockOutView() {
+        closeDetail();
+        masterPane.getChildren().clear();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(
+                    "/sk/foxer/erpstock/view/layout/stock_out.fxml"
+            ));
+            AnchorPane view = loader.load();
+
+            StockOutController controller = loader.getController();
+            controller.setMainController(this);
+
+            centerPane.getChildren().setAll(view);
+            AnchorPane.setTopAnchor(view, 0.0);
+            AnchorPane.setBottomAnchor(view, 0.0);
+            AnchorPane.setLeftAnchor(view, 0.0);
+            AnchorPane.setRightAnchor(view, 0.0);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void showCustomerDetail(Customer customer) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(
+                    "/sk/foxer/erpstock/view/layout/detail/customer_detail.fxml"
+            ));
+            AnchorPane detailView = loader.load();
+
+            String css = getClass().getResource("/sk/foxer/erpstock/view/style/supplier-detail.css").toExternalForm();
+            if (css != null) {
+                detailView.getStylesheets().add(css);
+            }
+
+            CustomerDetailController controller = loader.getController();
+            controller.setCustomer(customer);
+
+            detailPane.getChildren().setAll(detailView);
+            AnchorPane.setTopAnchor(detailView, 0.0);
+            AnchorPane.setBottomAnchor(detailView, 0.0);
+            AnchorPane.setLeftAnchor(detailView, 0.0);
+            AnchorPane.setRightAnchor(detailView, 0.0);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
     public void showProductEdit(Product product, boolean isNew, StockController stockController) {
         try {

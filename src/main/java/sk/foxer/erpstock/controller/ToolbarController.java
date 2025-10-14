@@ -11,9 +11,12 @@ public class ToolbarController {
         this.mainController = mainController;
     }
 
-    @FXML private Button btnStock;
-    @FXML private Button btnIncome;
-    @FXML private Button btnOutcome;
+    @FXML
+    private Button btnStock;
+    @FXML
+    private Button btnIncome;
+    @FXML
+    private Button btnOutcome;
 
     @FXML
     private void onStockClicked() {
@@ -30,6 +33,6 @@ public class ToolbarController {
     @FXML
     private void onOutcomeClicked() {
         System.out.println("Klikol si na: Výdaj");
-        // tu neskôr pridáš výdaj view
+        if (mainController != null) mainController.showStockOutView();
     }
 }
