@@ -5,6 +5,8 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import sk.foxer.erpstock.dao.stockin.StockInDao;
 import sk.foxer.erpstock.model.stockin.StockIn;
+import sk.foxer.erpstock.util.HandleExportUtil;
+import sk.foxer.erpstock.util.PdfExportUtil;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -40,6 +42,11 @@ public class SupplierIncomesController {
     public void loadForSupplier(int supplierId) {
         List<StockIn> list = StockInDao.getBySupplierId(supplierId);
         table.getItems().setAll(list);
+    }
+
+    @FXML
+    private void handleExportPdf() {
+        HandleExportUtil.handleExportPdf(table, PdfExportUtil::exportStockInTable);
     }
 
     private TableCell<StockIn, Double> moneyCell() {

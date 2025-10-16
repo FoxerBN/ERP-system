@@ -6,7 +6,6 @@ import sk.foxer.erpstock.controller.MainController;
 
 public class StockMasterController {
 
-    private MainController mainController;
     private StockController stockController;
 
     @FXML private Button btnAddProduct;
@@ -14,7 +13,6 @@ public class StockMasterController {
     @FXML private Button btnEditProduct;
 
     public void setControllers(MainController mainController, StockController stockController) {
-        this.mainController = mainController;
         this.stockController = stockController;
     }
 

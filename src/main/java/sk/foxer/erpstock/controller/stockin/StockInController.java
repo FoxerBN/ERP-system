@@ -33,8 +33,8 @@ public class StockInController {
         colUnitPrice.setCellValueFactory(new PropertyValueFactory<>("unitPrice"));
         colTotal.setCellValueFactory(new PropertyValueFactory<>("total"));
 
-        StockInDao dao = new StockInDao();
-        List<StockIn> list = dao.getAll();
+
+        List<StockIn> list = StockInDao.getAll();
         stockInTable.getItems().setAll(list);
 
         stockInTable.setOnMouseClicked(event -> {

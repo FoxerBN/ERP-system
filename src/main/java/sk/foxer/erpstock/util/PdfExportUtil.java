@@ -1,21 +1,33 @@
 package sk.foxer.erpstock.util;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.text.Normalizer;
-
 import javafx.collections.ObservableList;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import sk.foxer.erpstock.model.stockin.StockIn;
 import sk.foxer.erpstock.model.stockout.StockOut;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.Normalizer;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
+
 public final class PdfExportUtil {
+
+    private static final ColumnSpec[] COMMON_COLUMNS = {
+            new ColumnSpec("ID", 45f, Alignment.CENTER),
+            new ColumnSpec("Dátum", 80f, Alignment.CENTER),
+            new ColumnSpec("Produkt", 190f, Alignment.CENTER),
+            new ColumnSpec("Množstvo", 70f, Alignment.CENTER),
+            new ColumnSpec("Jedn. cena", 70f, Alignment.CENTER),
+            new ColumnSpec("Celkom", 60f, Alignment.CENTER)
+    };
 
     private PdfExportUtil() {
     }
@@ -26,23 +38,64 @@ public final class PdfExportUtil {
     }
 
     public static Path exportStockOutTable(List<StockOut> items, Path output) throws IOException {
+        return exportTable(
+                items,
+                output,
+                "Prehľad výdajov zákazníka",
+                stockOut -> new String[]{
+                        String.valueOf(stockOut.getId()),
+                        String.valueOf(stockOut.getDate()),
+                        nullSafe(stockOut.getProductName()),
+                        formatNumber(stockOut.getQuantity()),
+                        formatCurrency(stockOut.getUnitPrice()),
+                        formatCurrency(stockOut.getTotalPrice())
+                }
+        );
+    }
+
+    public static Path exportStockInTable(ObservableList<StockIn> items) throws IOException {
+        Path defaultPath = Paths.get(System.getProperty("user.home"), "supplier_incomes.pdf");
+        return exportStockInTable(items, defaultPath);
+    }
+
+    public static Path exportStockInTable(List<StockIn> items, Path output) throws IOException {
+        return exportTable(
+                items,
+                output,
+                "Prehľad príjmov dodávateľa",
+                stockIn -> new String[]{
+                        String.valueOf(stockIn.getId()),
+                        String.valueOf(stockIn.getDate()),
+                        nullSafe(stockIn.getProductName()),
+                        formatNumber(stockIn.getQuantity()),
+                        formatCurrency(stockIn.getUnitPrice()),
+                        formatCurrency(stockIn.getTotal())
+                }
+        );
+    }
+
+    private static <T> Path exportTable(
+            List<T> items,
+            Path output,
+            String title,
+            Function<T, String[]> rowMapper
+    ) throws IOException {
         if (items == null || items.isEmpty()) {
             throw new IOException("No data to export.");
         }
+        Objects.requireNonNull(rowMapper, "rowMapper");
 
         if (output.getParent() != null) {
             Files.createDirectories(output.getParent());
         }
 
         try (PDDocument document = new PDDocument()) {
-            ExportContext context = new ExportContext(document);
-            context.writeTitle("Prehľad výdajov zákazníka");
+            ExportContext context = new ExportContext(document, COMMON_COLUMNS);
+            context.writeTitle(title);
             context.writeHeader();
-
-            for (StockOut item : items) {
-                context.writeRow(item);
+            for (T item : items) {
+                context.writeRow(rowMapper.apply(item));
             }
-
             context.close();
             document.save(output.toFile());
         }
@@ -72,6 +125,7 @@ public final class PdfExportUtil {
 
     private static final class ExportContext {
         private final PDDocument document;
+        private final ColumnSpec[] columns;
         private PDPage page;
         private PDPageContentStream contentStream;
         private PDRectangle mediaBox;
@@ -82,7 +136,7 @@ public final class PdfExportUtil {
         private boolean headerWritten = false;
 
         private static final float MARGIN = 40f;
-        private static final float ROW_HEIGHT = 22f;
+        private static final float ROW_HEIGHT = 24f;
         private static final float PADDING = 6f;
         private static final float TITLE_FONT_SIZE = 15f;
         private static final float HEADER_FONT_SIZE = 11f;
@@ -91,22 +145,15 @@ public final class PdfExportUtil {
         private static final PDType1Font HEADER_FONT = PDType1Font.HELVETICA_BOLD;
         private static final PDType1Font BODY_FONT = PDType1Font.HELVETICA;
 
-        private static final ColumnSpec[] COLUMNS = {
-                new ColumnSpec("ID", 45f, Alignment.CENTER),
-                new ColumnSpec("Dátum", 80f, Alignment.CENTER),
-                new ColumnSpec("Produkt", 190f, Alignment.LEFT),
-                new ColumnSpec("Množstvo", 70f, Alignment.RIGHT),
-                new ColumnSpec("Jedn. cena", 70f, Alignment.RIGHT),
-                new ColumnSpec("Celkom", 60f, Alignment.RIGHT)
-        };
-
-        ExportContext(PDDocument document) throws IOException {
+        ExportContext(PDDocument document, ColumnSpec[] columns) throws IOException {
             this.document = document;
-            this.tableWidth = ColumnSpec.totalWidth(COLUMNS);
+            this.columns = columns;
+            this.tableWidth = ColumnSpec.totalWidth(columns);
             createNewPage();
         }
 
         void writeTitle(String title) throws IOException {
+            ensureContentStream();
             contentStream.setNonStrokingColor(33, 37, 41);
             contentStream.setFont(TITLE_FONT, TITLE_FONT_SIZE);
             contentStream.beginText();
@@ -127,18 +174,17 @@ public final class PdfExportUtil {
             headerWritten = true;
 
             drawRowBackground(true, false);
-            drawRowBorder();
-            drawVerticalSeparators();
+            drawCellBorders(ROW_HEIGHT);
 
             contentStream.setNonStrokingColor(33, 37, 41);
             contentStream.setFont(HEADER_FONT, HEADER_FONT_SIZE);
 
             float xCursor = xStart;
-            for (ColumnSpec column : COLUMNS) {
+            for (ColumnSpec column : columns) {
                 String headerText = fitText(column, column.header, HEADER_FONT, HEADER_FONT_SIZE);
                 float textWidth = textWidth(HEADER_FONT, HEADER_FONT_SIZE, headerText);
                 float textX = computeAlignedX(xCursor, column.width, textWidth, column.alignment);
-                float textY = yPosition - ROW_HEIGHT / 2 + 5;
+                float textY = baselineForFont(HEADER_FONT_SIZE);
 
                 contentStream.beginText();
                 contentStream.newLineAtOffset(textX, textY);
@@ -151,33 +197,23 @@ public final class PdfExportUtil {
             yPosition -= ROW_HEIGHT;
         }
 
-        void writeRow(StockOut item) throws IOException {
+        void writeRow(String[] values) throws IOException {
             ensureSpaceForRow();
             boolean shaded = (rowCounter % 2) == 1;
 
             drawRowBackground(false, shaded);
-            drawRowBorder();
-            drawVerticalSeparators();
+            drawCellBorders(ROW_HEIGHT);
 
             contentStream.setNonStrokingColor(45, 45, 45);
             contentStream.setFont(BODY_FONT, BODY_FONT_SIZE);
 
-            String[] values = {
-                    String.valueOf(item.getId()),
-                    String.valueOf(item.getDate()),
-                    nullSafe(item.getProductName()),
-                    formatNumber(item.getQuantity()),
-                    formatCurrency(item.getUnitPrice()),
-                    formatCurrency(item.getTotalPrice())
-            };
-
             float xCursor = xStart;
-            for (int i = 0; i < COLUMNS.length; i++) {
-                ColumnSpec column = COLUMNS[i];
+            for (int i = 0; i < columns.length; i++) {
+                ColumnSpec column = columns[i];
                 String value = fitText(column, values[i], BODY_FONT, BODY_FONT_SIZE);
                 float textWidth = textWidth(BODY_FONT, BODY_FONT_SIZE, value);
                 float textX = computeAlignedX(xCursor, column.width, textWidth, column.alignment);
-                float textY = yPosition - ROW_HEIGHT / 2 + 4;
+                float textY = baselineForFont(BODY_FONT_SIZE);
 
                 contentStream.beginText();
                 contentStream.newLineAtOffset(textX, textY);
@@ -226,27 +262,21 @@ public final class PdfExportUtil {
             } else if (shaded) {
                 contentStream.setNonStrokingColor(245, 245, 245);
             } else {
-                return;
+                contentStream.setNonStrokingColor(255, 255, 255);
             }
+
             contentStream.addRect(xStart, yPosition - ROW_HEIGHT, tableWidth, ROW_HEIGHT);
             contentStream.fill();
             contentStream.setNonStrokingColor(0, 0, 0);
         }
 
-        private void drawRowBorder() throws IOException {
-            contentStream.setStrokingColor(180, 180, 180);
-            contentStream.addRect(xStart, yPosition - ROW_HEIGHT, tableWidth, ROW_HEIGHT);
-            contentStream.stroke();
-        }
-
-        private void drawVerticalSeparators() throws IOException {
+        private void drawCellBorders(float rowHeight) throws IOException {
             contentStream.setStrokingColor(200, 200, 200);
             float xCursor = xStart;
-            for (ColumnSpec column : COLUMNS) {
-                xCursor += column.width;
-                contentStream.moveTo(xCursor, yPosition);
-                contentStream.lineTo(xCursor, yPosition - ROW_HEIGHT);
+            for (ColumnSpec column : columns) {
+                contentStream.addRect(xCursor, yPosition - rowHeight, column.width, rowHeight);
                 contentStream.stroke();
+                xCursor += column.width;
             }
             contentStream.setStrokingColor(180, 180, 180);
         }
@@ -256,8 +286,13 @@ public final class PdfExportUtil {
                 case RIGHT:
                     return Math.max(columnX + PADDING, columnX + columnWidth - PADDING - textWidth);
                 case CENTER:
-                    float center = columnX + (columnWidth - textWidth) / 2f;
-                    return center < columnX + PADDING ? columnX + PADDING : center;
+                    float centered = columnX + (columnWidth - textWidth) / 2f;
+                    float min = columnX + PADDING;
+                    float max = columnX + columnWidth - PADDING - textWidth;
+                    if (max <= min) {
+                        return min;
+                    }
+                    return Math.max(min, Math.min(max, centered));
                 default:
                     return columnX + PADDING;
             }
@@ -292,36 +327,43 @@ public final class PdfExportUtil {
             return font.getStringWidth(text) / 1000f * fontSize;
         }
 
+        private float baselineForFont(float fontSize) {
+            float centered = yPosition - ROW_HEIGHT / 2f + fontSize * 0.35f;
+            float minBaseline = yPosition - ROW_HEIGHT + PADDING + fontSize * 0.2f;
+            float maxBaseline = yPosition - PADDING;
+            return Math.max(minBaseline, Math.min(maxBaseline, centered));
+        }
+
         private void ensureContentStream() {
             if (contentStream == null) {
                 throw new IllegalStateException("Content stream is not initialized.");
             }
         }
+    }
 
-        private static final class ColumnSpec {
-            final String header;
-            final float width;
-            final Alignment alignment;
+    private enum Alignment {
+        LEFT,
+        CENTER,
+        RIGHT
+    }
 
-            ColumnSpec(String header, float width, Alignment alignment) {
-                this.header = header;
-                this.width = width;
-                this.alignment = alignment;
-            }
+    private static final class ColumnSpec {
+        final String header;
+        final float width;
+        final Alignment alignment;
 
-            static float totalWidth(ColumnSpec[] columns) {
-                float total = 0f;
-                for (ColumnSpec column : columns) {
-                    total += column.width;
-                }
-                return total;
-            }
+        ColumnSpec(String header, float width, Alignment alignment) {
+            this.header = header;
+            this.width = width;
+            this.alignment = alignment;
         }
 
-        private enum Alignment {
-            LEFT,
-            CENTER,
-            RIGHT
+        static float totalWidth(ColumnSpec[] columns) {
+            float total = 0f;
+            for (ColumnSpec column : columns) {
+                total += column.width;
+            }
+            return total;
         }
     }
 }

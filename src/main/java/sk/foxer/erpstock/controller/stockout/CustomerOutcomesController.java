@@ -1,15 +1,13 @@
 package sk.foxer.erpstock.controller.stockout;
 
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import sk.foxer.erpstock.dao.stockout.StockOutDao;
 import sk.foxer.erpstock.model.stockout.StockOut;
+import sk.foxer.erpstock.util.HandleExportUtil;
 import sk.foxer.erpstock.util.PdfExportUtil;
 
-import java.io.IOException;
-import java.nio.file.Path;
 import java.util.List;
 
 public class CustomerOutcomesController {
@@ -35,24 +33,11 @@ public class CustomerOutcomesController {
         colUnitPrice.setCellFactory(tc -> moneyCell());
         colTotal.setCellFactory(tc -> moneyCell());
 
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
 
     @FXML
     private void handleExportPdf() {
-        ObservableList<StockOut> items = table.getItems();
-        if (items == null || items.isEmpty()) {
-            showInfo("Export", "Tabuľka je prázdna – nie je čo exportovať.");
-            return;
-        }
-
-        try {
-            Path savedFile = PdfExportUtil.exportStockOutTable(items);
-            showInfo("Export", "PDF bolo uložené do: " + savedFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-            showError("Export zlyhal", "PDF sa nepodarilo vytvoriť.");
-        }
+        HandleExportUtil.handleExportPdf(table, PdfExportUtil::exportStockOutTable);
     }
 
     public void loadForCustomer(int customerId) {
@@ -76,19 +61,5 @@ public class CustomerOutcomesController {
                 setText(empty || v == null ? null : String.format("%.2f", v));
             }
         };
-    }
-
-    private void showInfo(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setHeaderText(title);
-        alert.setContentText(message);
-        alert.show();
-    }
-
-    private void showError(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setHeaderText(title);
-        alert.setContentText(message);
-        alert.show();
     }
 }
